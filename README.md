@@ -7,7 +7,30 @@ This edition provides a community‑focused foundation for exploring BotScanner�
 BotScanner‑Community does **not** represent the full commercial product.  
 The Professional and Enterprise editions include advanced automation, enforcement modes, backend integrations, diagnostics, and policy‑driven features. Those editions remain private and are not part of this repository.
 
-More details will be added as the project evolves.
+## 🔍 Planned Scope of the Community Edition
+
+The Community Edition focuses on **visibility**, **diagnostics**, and **safe read‑only analysis** of Linux firewall configurations. It is intentionally lightweight and does not include enforcement or policy‑driven automation. Planned capabilities include:
+
+- **Backend Detection**  
+  Automatically identify whether the system is using nftables, iptables/ip6tables, or ufw.
+
+- **Interface & Zone Discovery**  
+  Enumerate system interfaces (e.g., `lo`, `ethX`, `brX`, `vnetX`) and derive basic zone mappings for visibility and reporting.
+
+- **Read‑Only Firewall Audit**  
+  Inspect active rules, highlight potential misconfigurations, and provide a backend‑agnostic view of rule structure.
+
+- **Baseline Snapshots**  
+  Generate and compare snapshots of firewall state to detect configuration drift without applying changes.
+
+- **Minimal CLI**  
+  A simple command‑line interface for scanning, snapshotting, and retrieving system information.
+
+These features are designed to help users understand firewall behavior, explore BotScanner’s architecture, and experiment with backend‑agnostic workflows in a safe, non‑destructive environment.
+
+---
+
+## 🔑 Suggested Keywords
 
 ---
 
