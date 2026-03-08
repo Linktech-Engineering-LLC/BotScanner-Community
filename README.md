@@ -1,4 +1,7 @@
 # 🛡️ BotScanner‑Community
+> **Status:** 🚧 Under Construction  
+> This repository contains the public skeleton of BotScanner Community Edition.  
+> Core modules, documentation, and architecture are being published in phases.
 
 **BotScanner‑Community** is the open‑source edition of BotScanner, a platform‑grade firewall automation and diagnostics tool developed by Linktech Engineering LLC.
 
