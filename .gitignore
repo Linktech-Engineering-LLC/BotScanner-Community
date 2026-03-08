@@ -1,0 +1,16 @@
+.svn/
+.venv/
+.vscode/
+__pycache__/
+archive/
+data/
+Logs/
+*.jsonl
+BotScanner.egg-info/
+BotScanner.code-workspace
+var/
+# Ignore the top-level docs folder
+docs/
+
+# But DO NOT ignore the nested docs folder
+!BotScanner/docs/

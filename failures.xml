@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="8" skipped="7" tests="31" time="0.488" timestamp="2025-11-29T15:18:31.381477-06:00" hostname="Dad"><testcase classname="tests.test_backend_template.TestBackendAwareFunctions" name="test_recover_entries[nftables-botfilter-1h]" time="0.000"><skipped type="pytest.skip" message="Template test file  backend logic not implemented yet">/mnt/Mom/Scripts/Python/BotScanner/tests/test_backend_template.py:13: Template test file  backend logic not implemented yet</skipped></testcase><testcase classname="tests.test_backend_template.TestBackendAwareFunctions" name="test_recover_entries[firewalld-botfilter-1h]" time="0.000"><skipped type="pytest.skip" message="Template test file  backend logic not implemented yet">/mnt/Mom/Scripts/Python/BotScanner/tests/test_backend_template.py:13: Template test file  backend logic not implemented yet</skipped></testcase><testcase classname="tests.test_backend_template.TestBackendAwareFunctions" name="test_recover_entries[firewalld-firewalld-2h]" time="0.000"><skipped type="pytest.skip" message="Template test file  backend logic not implemented yet">/mnt/Mom/Scripts/Python/BotScanner/tests/test_backend_template.py:13: Template test file  backend logic not implemented yet</skipped></testcase><testcase classname="tests.test_backend_template.TestBackendAwareFunctions" name="test_recreate_table" time="0.000"><skipped type="pytest.skip" message="Template test file  backend logic not implemented yet">/mnt/Mom/Scripts/Python/BotScanner/tests/test_backend_template.py:32: Template test file  backend logic not implemented yet</skipped></testcase><testcase classname="tests.test_commands" name="test_command_success[local_command-echo 'hello world']" time="0.003" /><testcase classname="tests.test_commands" name="test_command_success[sudo_run-echo 'hello world']" time="0.002" /><testcase classname="tests.test_commands" name="test_command_failure[local_command-nonexistentcommand]" time="0.002" /><testcase classname="tests.test_commands" name="test_command_failure[sudo_run-nonexistentcommand]" time="0.002" /><testcase classname="tests.test_confirm_config" name="test_confirm_config_all_ok" time="0.003"><failure message="RuntimeError: /bin/sh: nft: command not found">cmd = 'nft list ruleset', raise_on_error = True
+
+    def local_command(cmd: str, raise_on_error: bool = True) -&gt; tuple[str, int, str]:
+        try:
+            logger.command_start(cmd)
+            proc = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            logger.command_end(cmd, proc.returncode)
+            if proc.returncode != 0:
+                logger.command_error("local_command", RuntimeError(proc.stderr.strip()))
+                if raise_on_error:
+&gt;                   raise RuntimeError(proc.stderr.strip())
+E                   RuntimeError: /bin/sh: nft: command not found
+
+net/net_tools.py:62: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+caplog = &lt;_pytest.logging.LogCaptureFixture object at 0x7f8bce632c00&gt;
+
+    def test_confirm_config_all_ok(caplog):
+&gt;       results = confirm_config(sudo_password=None, backend="nftables")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_confirm_config.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+firewall/enforcers.py:70: in confirm_config
+    baseline = get_firewall_baseline(sudo_password, backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+firewall/baseline.py:159: in get_firewall_baseline
+    nft = sudo_run("nft list ruleset", sudo_password)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+net/net_tools.py:95: in sudo_run
+    return local_command(cmd)
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+cmd = 'nft list ruleset', raise_on_error = True
+
+    def local_command(cmd: str, raise_on_error: bool = True) -&gt; tuple[str, int, str]:
+        try:
+            logger.command_start(cmd)
+            proc = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            logger.command_end(cmd, proc.returncode)
+            if proc.returncode != 0:
+                logger.command_error("local_command", RuntimeError(proc.stderr.strip()))
+                if raise_on_error:
+                    raise RuntimeError(proc.stderr.strip())
+            return proc.stdout.strip(), proc.returncode, proc.stderr.strip()
+    
+        except Exception as error:
+            logger.command_error("local_command", error)
+            if raise_on_error:
+&gt;               raise RuntimeError(str(error))
+E               RuntimeError: /bin/sh: nft: command not found
+
+net/net_tools.py:68: RuntimeError</failure></testcase><testcase classname="tests.test_confirm_config" name="test_confirm_config_missing_set_chain" time="0.003"><failure message="RuntimeError: /bin/sh: nft: command not found">cmd = 'nft list ruleset', raise_on_error = True
+
+    def local_command(cmd: str, raise_on_error: bool = True) -&gt; tuple[str, int, str]:
+        try:
+            logger.command_start(cmd)
+            proc = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            logger.command_end(cmd, proc.returncode)
+            if proc.returncode != 0:
+                logger.command_error("local_command", RuntimeError(proc.stderr.strip()))
+                if raise_on_error:
+&gt;                   raise RuntimeError(proc.stderr.strip())
+E                   RuntimeError: /bin/sh: nft: command not found
+
+net/net_tools.py:62: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+caplog = &lt;_pytest.logging.LogCaptureFixture object at 0x7f8bce6332c0&gt;
+
+    def test_confirm_config_missing_set_chain(caplog):
+&gt;       confirm_config(sudo_password=None, backend="nftables")
+
+tests/test_confirm_config.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+firewall/enforcers.py:70: in confirm_config
+    baseline = get_firewall_baseline(sudo_password, backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+firewall/baseline.py:159: in get_firewall_baseline
+    nft = sudo_run("nft list ruleset", sudo_password)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+net/net_tools.py:95: in sudo_run
+    return local_command(cmd)
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+cmd = 'nft list ruleset', raise_on_error = True
+
+    def local_command(cmd: str, raise_on_error: bool = True) -&gt; tuple[str, int, str]:
+        try:
+            logger.command_start(cmd)
+            proc = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            logger.command_end(cmd, proc.returncode)
+            if proc.returncode != 0:
+                logger.command_error("local_command", RuntimeError(proc.stderr.strip()))
+                if raise_on_error:
+                    raise RuntimeError(proc.stderr.strip())
+            return proc.stdout.strip(), proc.returncode, proc.stderr.strip()
+    
+        except Exception as error:
+            logger.command_error("local_command", error)
+            if raise_on_error:
+&gt;               raise RuntimeError(str(error))
+E               RuntimeError: /bin/sh: nft: command not found
+
+net/net_tools.py:68: RuntimeError</failure></testcase><testcase classname="tests.test_enforce_tables" name="test_enforce_tables[nftables-confirm_result0-expected_calls0-expected_logs0]" time="0.001"><failure message="TypeError: test_enforce_tables.&lt;locals&gt;.&lt;lambda&gt;() takes 2 positional arguments but 3 were given">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f8bce633a10&gt;, backend = 'nftables'
+confirm_result = {'botfilter': {'ok': False}, 'chains': {'botchain': {'ok': False}}, 'sets': {'botblock': {'ok': False}}}
+expected_calls = ['recreate_table', 'recreate_set', 'recreate_chain', 'apply_entries'], expected_logs = ['Recreating botfilter', 'Recreating set botblock', 'Recreating chain botchain']
+
+    @pytest.mark.parametrize(
+        "backend,confirm_result,expected_calls,expected_logs",
+        [
+            # --- All fail (nftables) ---
+            (
+                "nftables",
+                {"botfilter": {"ok": False}, "sets": {"botblock": {"ok": False}}, "chains": {"botchain": {"ok": False}}},
+                ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"],
+                ["Recreating botfilter", "Recreating set botblock", "Recreating chain botchain"],
+            ),
+            # --- Firewalld skip table, but sets/chains recreated ---
+            (
+                "firewalld",
+                {"firewalld": {"ok": False}, "sets": {}, "chains": {}},
+                ["recreate_set", "recreate_chain", "apply_entries"],
+                [
+                    "Skipping table recreation for firewalld",
+                    "Recreating set botblock",
+                    "Recreating chain botchain",
+                ],
+            ),
+            # --- Partial failure (nftables) ---
+            (
+                "nftables",
+                {"botfilter": {"ok": True}, "sets": {"botblock": {"ok": False}}, "chains": {"botchain": {"ok": True}}},
+                ["recreate_set", "apply_entries"],
+                ["botfilter passed checks", "Chain botchain passed checks", "Recreating set botblock"],
+            ),
+            # --- Unknown backend branch ---
+            (
+                "foobar",
+                {"botfilter": {"ok": False}, "sets": {}, "chains": {}},
+                ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"],
+                [
+                    "Unknown backend foobar, defaulting to botfilter",
+                    "Recreating botfilter",
+                    "Recreating set botblock",
+                    "Recreating chain botchain",
+                ],
+            ),
+        ]
+    )
+    def test_enforce_tables(monkeypatch, backend, confirm_result, expected_calls, expected_logs):
+        # Patch confirm_config inside enforcers
+        def fake_confirm(sudo_password=None, backend=backend):
+            return confirm_result
+        monkeypatch.setattr("BotScanner.firewall.enforcers.confirm_config", fake_confirm)
+    
+        # Patch enforcement routines inside enforcers
+        for call in ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"]:
+            monkeypatch.setattr(
+                f"BotScanner.firewall.enforcers.{call}",
+                lambda sudo_password, backend: fake_logger.info(f"enforce_tables called for {backend}")
+            )
+    
+&gt;       enforce_tables(sudo_password=None, backend=backend)
+
+tests/test_enforce_tables.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+sudo_password = None, backend = 'nftables'
+
+    def enforce_tables(sudo_password: Optional[str], backend: str = "nftables"):
+        results = confirm_config(sudo_password, backend)
+        # Explicit backend-aware table naming
+        match backend:
+            case "nftables":
+                table = f"{WEB_PREFIX}filter"
+            case "firewalld":
+                table = backend
+            case _:
+                table = f"{WEB_PREFIX}filter"
+                logger.warning(f"[ORCH] Unknown backend {backend}, defaulting to {table}")
+        outcome = results.get(table, {"ok": False})
+        if not outcome["ok"]:
+            if backend == "firewalld":
+                logger.info(f"[ORCH] Skipping table recreation for {table} (firewalld manages tables)")
+            else:
+                logger.warning(f"[ORCH] Recreating {table} due to failed checks")
+&gt;               recreate_table(table, backend, sudo_password)
+E               TypeError: test_enforce_tables.&lt;locals&gt;.&lt;lambda&gt;() takes 2 positional arguments but 3 were given
+
+firewall/enforcers.py:157: TypeError</failure></testcase><testcase classname="tests.test_enforce_tables" name="test_enforce_tables[firewalld-confirm_result1-expected_calls1-expected_logs1]" time="0.001"><failure message="TypeError: test_enforce_tables.&lt;locals&gt;.&lt;lambda&gt;() takes 2 positional arguments but 4 were given">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f8bce6055e0&gt;, backend = 'firewalld', confirm_result = {'chains': {}, 'firewalld': {'ok': False}, 'sets': {}}
+expected_calls = ['recreate_set', 'recreate_chain', 'apply_entries'], expected_logs = ['Skipping table recreation for firewalld', 'Recreating set botblock', 'Recreating chain botchain']
+
+    @pytest.mark.parametrize(
+        "backend,confirm_result,expected_calls,expected_logs",
+        [
+            # --- All fail (nftables) ---
+            (
+                "nftables",
+                {"botfilter": {"ok": False}, "sets": {"botblock": {"ok": False}}, "chains": {"botchain": {"ok": False}}},
+                ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"],
+                ["Recreating botfilter", "Recreating set botblock", "Recreating chain botchain"],
+            ),
+            # --- Firewalld skip table, but sets/chains recreated ---
+            (
+                "firewalld",
+                {"firewalld": {"ok": False}, "sets": {}, "chains": {}},
+                ["recreate_set", "recreate_chain", "apply_entries"],
+                [
+                    "Skipping table recreation for firewalld",
+                    "Recreating set botblock",
+                    "Recreating chain botchain",
+                ],
+            ),
+            # --- Partial failure (nftables) ---
+            (
+                "nftables",
+                {"botfilter": {"ok": True}, "sets": {"botblock": {"ok": False}}, "chains": {"botchain": {"ok": True}}},
+                ["recreate_set", "apply_entries"],
+                ["botfilter passed checks", "Chain botchain passed checks", "Recreating set botblock"],
+            ),
+            # --- Unknown backend branch ---
+            (
+                "foobar",
+                {"botfilter": {"ok": False}, "sets": {}, "chains": {}},
+                ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"],
+                [
+                    "Unknown backend foobar, defaulting to botfilter",
+                    "Recreating botfilter",
+                    "Recreating set botblock",
+                    "Recreating chain botchain",
+                ],
+            ),
+        ]
+    )
+    def test_enforce_tables(monkeypatch, backend, confirm_result, expected_calls, expected_logs):
+        # Patch confirm_config inside enforcers
+        def fake_confirm(sudo_password=None, backend=backend):
+            return confirm_result
+        monkeypatch.setattr("BotScanner.firewall.enforcers.confirm_config", fake_confirm)
+    
+        # Patch enforcement routines inside enforcers
+        for call in ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"]:
+            monkeypatch.setattr(
+                f"BotScanner.firewall.enforcers.{call}",
+                lambda sudo_password, backend: fake_logger.info(f"enforce_tables called for {backend}")
+            )
+    
+&gt;       enforce_tables(sudo_password=None, backend=backend)
+
+tests/test_enforce_tables.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+sudo_password = None, backend = 'firewalld'
+
+    def enforce_tables(sudo_password: Optional[str], backend: str = "nftables"):
+        results = confirm_config(sudo_password, backend)
+        # Explicit backend-aware table naming
+        match backend:
+            case "nftables":
+                table = f"{WEB_PREFIX}filter"
+            case "firewalld":
+                table = backend
+            case _:
+                table = f"{WEB_PREFIX}filter"
+                logger.warning(f"[ORCH] Unknown backend {backend}, defaulting to {table}")
+        outcome = results.get(table, {"ok": False})
+        if not outcome["ok"]:
+            if backend == "firewalld":
+                logger.info(f"[ORCH] Skipping table recreation for {table} (firewalld manages tables)")
+            else:
+                logger.warning(f"[ORCH] Recreating {table} due to failed checks")
+                recreate_table(table, backend, sudo_password)
+        else:
+            logger.info(f"[ORCH] {table} passed checks, recovering entries")
+    
+        # --- Sets ---
+        sets = _ensure_set_defaults(results, "block", WEB_PREFIX, table, backend)
+        for set_name, set_outcome in sets.items():
+            if not set_outcome.get("ok", False):
+                logger.warning(f"[ORCH] Recreating set {set_name} due to failed checks")
+&gt;               recreate_set(table, set_name, backend, sudo_password)
+E               TypeError: test_enforce_tables.&lt;locals&gt;.&lt;lambda&gt;() takes 2 positional arguments but 4 were given
+
+firewall/enforcers.py:166: TypeError</failure></testcase><testcase classname="tests.test_enforce_tables" name="test_enforce_tables[nftables-confirm_result2-expected_calls2-expected_logs2]" time="0.001"><failure message="TypeError: test_enforce_tables.&lt;locals&gt;.&lt;lambda&gt;() takes 2 positional arguments but 4 were given">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f8bce633aa0&gt;, backend = 'nftables'
+confirm_result = {'botfilter': {'ok': True}, 'chains': {'botchain': {'ok': True}}, 'sets': {'botblock': {'ok': False}}}, expected_calls = ['recreate_set', 'apply_entries']
+expected_logs = ['botfilter passed checks', 'Chain botchain passed checks', 'Recreating set botblock']
+
+    @pytest.mark.parametrize(
+        "backend,confirm_result,expected_calls,expected_logs",
+        [
+            # --- All fail (nftables) ---
+            (
+                "nftables",
+                {"botfilter": {"ok": False}, "sets": {"botblock": {"ok": False}}, "chains": {"botchain": {"ok": False}}},
+                ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"],
+                ["Recreating botfilter", "Recreating set botblock", "Recreating chain botchain"],
+            ),
+            # --- Firewalld skip table, but sets/chains recreated ---
+            (
+                "firewalld",
+                {"firewalld": {"ok": False}, "sets": {}, "chains": {}},
+                ["recreate_set", "recreate_chain", "apply_entries"],
+                [
+                    "Skipping table recreation for firewalld",
+                    "Recreating set botblock",
+                    "Recreating chain botchain",
+                ],
+            ),
+            # --- Partial failure (nftables) ---
+            (
+                "nftables",
+                {"botfilter": {"ok": True}, "sets": {"botblock": {"ok": False}}, "chains": {"botchain": {"ok": True}}},
+                ["recreate_set", "apply_entries"],
+                ["botfilter passed checks", "Chain botchain passed checks", "Recreating set botblock"],
+            ),
+            # --- Unknown backend branch ---
+            (
+                "foobar",
+                {"botfilter": {"ok": False}, "sets": {}, "chains": {}},
+                ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"],
+                [
+                    "Unknown backend foobar, defaulting to botfilter",
+                    "Recreating botfilter",
+                    "Recreating set botblock",
+                    "Recreating chain botchain",
+                ],
+            ),
+        ]
+    )
+    def test_enforce_tables(monkeypatch, backend, confirm_result, expected_calls, expected_logs):
+        # Patch confirm_config inside enforcers
+        def fake_confirm(sudo_password=None, backend=backend):
+            return confirm_result
+        monkeypatch.setattr("BotScanner.firewall.enforcers.confirm_config", fake_confirm)
+    
+        # Patch enforcement routines inside enforcers
+        for call in ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"]:
+            monkeypatch.setattr(
+                f"BotScanner.firewall.enforcers.{call}",
+                lambda sudo_password, backend: fake_logger.info(f"enforce_tables called for {backend}")
+            )
+    
+&gt;       enforce_tables(sudo_password=None, backend=backend)
+
+tests/test_enforce_tables.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+sudo_password = None, backend = 'nftables'
+
+    def enforce_tables(sudo_password: Optional[str], backend: str = "nftables"):
+        results = confirm_config(sudo_password, backend)
+        # Explicit backend-aware table naming
+        match backend:
+            case "nftables":
+                table = f"{WEB_PREFIX}filter"
+            case "firewalld":
+                table = backend
+            case _:
+                table = f"{WEB_PREFIX}filter"
+                logger.warning(f"[ORCH] Unknown backend {backend}, defaulting to {table}")
+        outcome = results.get(table, {"ok": False})
+        if not outcome["ok"]:
+            if backend == "firewalld":
+                logger.info(f"[ORCH] Skipping table recreation for {table} (firewalld manages tables)")
+            else:
+                logger.warning(f"[ORCH] Recreating {table} due to failed checks")
+                recreate_table(table, backend, sudo_password)
+        else:
+            logger.info(f"[ORCH] {table} passed checks, recovering entries")
+    
+        # --- Sets ---
+        sets = _ensure_set_defaults(results, "block", WEB_PREFIX, table, backend)
+        for set_name, set_outcome in sets.items():
+            if not set_outcome.get("ok", False):
+                logger.warning(f"[ORCH] Recreating set {set_name} due to failed checks")
+&gt;               recreate_set(table, set_name, backend, sudo_password)
+E               TypeError: test_enforce_tables.&lt;locals&gt;.&lt;lambda&gt;() takes 2 positional arguments but 4 were given
+
+firewall/enforcers.py:166: TypeError</failure></testcase><testcase classname="tests.test_enforce_tables" name="test_enforce_tables[foobar-confirm_result3-expected_calls3-expected_logs3]" time="0.001"><failure message="TypeError: test_enforce_tables.&lt;locals&gt;.&lt;lambda&gt;() takes 2 positional arguments but 3 were given">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f8bce633020&gt;, backend = 'foobar', confirm_result = {'botfilter': {'ok': False}, 'chains': {}, 'sets': {}}
+expected_calls = ['recreate_table', 'recreate_set', 'recreate_chain', 'apply_entries']
+expected_logs = ['Unknown backend foobar, defaulting to botfilter', 'Recreating botfilter', 'Recreating set botblock', 'Recreating chain botchain']
+
+    @pytest.mark.parametrize(
+        "backend,confirm_result,expected_calls,expected_logs",
+        [
+            # --- All fail (nftables) ---
+            (
+                "nftables",
+                {"botfilter": {"ok": False}, "sets": {"botblock": {"ok": False}}, "chains": {"botchain": {"ok": False}}},
+                ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"],
+                ["Recreating botfilter", "Recreating set botblock", "Recreating chain botchain"],
+            ),
+            # --- Firewalld skip table, but sets/chains recreated ---
+            (
+                "firewalld",
+                {"firewalld": {"ok": False}, "sets": {}, "chains": {}},
+                ["recreate_set", "recreate_chain", "apply_entries"],
+                [
+                    "Skipping table recreation for firewalld",
+                    "Recreating set botblock",
+                    "Recreating chain botchain",
+                ],
+            ),
+            # --- Partial failure (nftables) ---
+            (
+                "nftables",
+                {"botfilter": {"ok": True}, "sets": {"botblock": {"ok": False}}, "chains": {"botchain": {"ok": True}}},
+                ["recreate_set", "apply_entries"],
+                ["botfilter passed checks", "Chain botchain passed checks", "Recreating set botblock"],
+            ),
+            # --- Unknown backend branch ---
+            (
+                "foobar",
+                {"botfilter": {"ok": False}, "sets": {}, "chains": {}},
+                ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"],
+                [
+                    "Unknown backend foobar, defaulting to botfilter",
+                    "Recreating botfilter",
+                    "Recreating set botblock",
+                    "Recreating chain botchain",
+                ],
+            ),
+        ]
+    )
+    def test_enforce_tables(monkeypatch, backend, confirm_result, expected_calls, expected_logs):
+        # Patch confirm_config inside enforcers
+        def fake_confirm(sudo_password=None, backend=backend):
+            return confirm_result
+        monkeypatch.setattr("BotScanner.firewall.enforcers.confirm_config", fake_confirm)
+    
+        # Patch enforcement routines inside enforcers
+        for call in ["recreate_table", "recreate_set", "recreate_chain", "apply_entries"]:
+            monkeypatch.setattr(
+                f"BotScanner.firewall.enforcers.{call}",
+                lambda sudo_password, backend: fake_logger.info(f"enforce_tables called for {backend}")
+            )
+    
+&gt;       enforce_tables(sudo_password=None, backend=backend)
+
+tests/test_enforce_tables.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+sudo_password = None, backend = 'foobar'
+
+    def enforce_tables(sudo_password: Optional[str], backend: str = "nftables"):
+        results = confirm_config(sudo_password, backend)
+        # Explicit backend-aware table naming
+        match backend:
+            case "nftables":
+                table = f"{WEB_PREFIX}filter"
+            case "firewalld":
+                table = backend
+            case _:
+                table = f"{WEB_PREFIX}filter"
+                logger.warning(f"[ORCH] Unknown backend {backend}, defaulting to {table}")
+        outcome = results.get(table, {"ok": False})
+        if not outcome["ok"]:
+            if backend == "firewalld":
+                logger.info(f"[ORCH] Skipping table recreation for {table} (firewalld manages tables)")
+            else:
+                logger.warning(f"[ORCH] Recreating {table} due to failed checks")
+&gt;               recreate_table(table, backend, sudo_password)
+E               TypeError: test_enforce_tables.&lt;locals&gt;.&lt;lambda&gt;() takes 2 positional arguments but 3 were given
+
+firewall/enforcers.py:157: TypeError</failure></testcase><testcase classname="tests.test_flags" name="test_bitmapflags_values" time="0.000" /><testcase classname="tests.test_flags" name="test_bitmapflags_type" time="0.000" /><testcase classname="tests.test_function_template.TestFunctionTemplate" name="test_execution" time="0.000"><skipped type="pytest.skip" message="Template test file  fill in with real logic">/mnt/Mom/Scripts/Python/BotScanner/tests/test_function_template.py:18: Template test file  fill in with real logic</skipped></testcase><testcase classname="tests.test_function_template.TestFunctionTemplate" name="test_output_structure" time="0.000"><skipped type="pytest.skip" message="Template test file  fill in with real logic">/mnt/Mom/Scripts/Python/BotScanner/tests/test_function_template.py:24: Template test file  fill in with real logic</skipped></testcase><testcase classname="tests.test_function_template.TestFunctionTemplate" name="test_edge_cases" time="0.000"><skipped type="pytest.skip" message="Template test file  fill in with real logic">/mnt/Mom/Scripts/Python/BotScanner/tests/test_function_template.py:30: Template test file  fill in with real logic</skipped></testcase><testcase classname="tests.test_logger" name="test_logger_info_message" time="0.001" /><testcase classname="tests.test_logger" name="test_logger_lifecycle_markers" time="0.001" /><testcase classname="tests.test_logger" name="test_verbose_output" time="0.004" /><testcase classname="tests.test_logger" name="test_cron_output" time="0.001" /><testcase classname="tests.test_monitor_server" name="test_monitor_server[config0-inventory0-&lt;lambda&gt;]" time="0.014" /><testcase classname="tests.test_monitor_server" name="test_monitor_server[config1-inventory1-None]" time="0.003" /><testcase classname="tests.test_monitor_server" name="test_monitor_server[config2-inventory2-None]" time="0.002" /><testcase classname="tests.test_net_tools" name="test_sudo_run_success" time="0.001" /><testcase classname="tests.test_net_tools" name="test_sudo_run_failure" time="0.001" /><testcase classname="tests.test_net_tools" name="test_sudo_run_exception" time="0.001" /><testcase classname="tests.test_orchestrator_baseline" name="test_orchestrator_enforce[2097152-backends0-expected_msgs0]" time="0.001"><failure message="assert False&#10; +  where False = any(&lt;generator object test_orchestrator_enforce.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f8bce6a43c0&gt;)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f8bce6e3d10&gt;, fake_logger = &lt;BotScanner.tests.test_orchestrator_baseline.fake_logger.&lt;locals&gt;.Logger object at 0x7f8bce6e3d70&gt;
+flag = &lt;BitmapFlags.ENFORCE_FIREWALL: 2097152&gt;, backends = ['firewalld'], expected_msgs = ['[ORCH] Enforcing firewalld config...', 'Enforce called', '[ORCH] Enforcement complete for firewalld']
+
+    @pytest.mark.parametrize(
+        "flag,backends,expected_msgs",
+        [
+            (BitmapFlags.ENFORCE_FIREWALL, ["firewalld"],
+             ["[ORCH] Enforcing firewalld config...",
+              "Enforce called",
+              "[ORCH] Enforcement complete for firewalld"]),
+            (BitmapFlags.ENFORCE_NFTABLES, ["nftables"],
+             ["[ORCH] Enforcing nftables config...",
+              "Enforce called",
+              "[ORCH] Enforcement complete for nftables"]),
+        ],
+    )
+    def test_orchestrator_enforce(monkeypatch, fake_logger, flag, backends, expected_msgs):
+        # Patch enforce_tables to avoid sudo and just log a marker
+        monkeypatch.setattr(
+            "BotScanner.firewall.manager.enforce_tables",
+            lambda logger, sudo_password, backend: fake_logger.info("Enforce called")
+        )
+    
+        for backend in backends:
+            # Match production signature: (sudo_password, backend, flags)
+            orch = FirewallOrchestrator("pass", backend, flag)
+            orch.orchestrate()
+    
+        # Assert expected log messages are present
+        for expected in expected_msgs:
+            print(fake_logger.messages)
+&gt;           assert any(expected in msg for _, msg in fake_logger.messages)
+E           assert False
+E            +  where False = any(&lt;generator object test_orchestrator_enforce.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f8bce6a43c0&gt;)
+
+tests/test_orchestrator_baseline.py:51: AssertionError</failure></testcase><testcase classname="tests.test_orchestrator_baseline" name="test_orchestrator_enforce[4194304-backends1-expected_msgs1]" time="0.001"><failure message="assert False&#10; +  where False = any(&lt;generator object test_orchestrator_enforce.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f8bce6a4820&gt;)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f8bce6e3410&gt;, fake_logger = &lt;BotScanner.tests.test_orchestrator_baseline.fake_logger.&lt;locals&gt;.Logger object at 0x7f8bce6e3800&gt;
+flag = &lt;BitmapFlags.ENFORCE_NFTABLES: 4194304&gt;, backends = ['nftables'], expected_msgs = ['[ORCH] Enforcing nftables config...', 'Enforce called', '[ORCH] Enforcement complete for nftables']
+
+    @pytest.mark.parametrize(
+        "flag,backends,expected_msgs",
+        [
+            (BitmapFlags.ENFORCE_FIREWALL, ["firewalld"],
+             ["[ORCH] Enforcing firewalld config...",
+              "Enforce called",
+              "[ORCH] Enforcement complete for firewalld"]),
+            (BitmapFlags.ENFORCE_NFTABLES, ["nftables"],
+             ["[ORCH] Enforcing nftables config...",
+              "Enforce called",
+              "[ORCH] Enforcement complete for nftables"]),
+        ],
+    )
+    def test_orchestrator_enforce(monkeypatch, fake_logger, flag, backends, expected_msgs):
+        # Patch enforce_tables to avoid sudo and just log a marker
+        monkeypatch.setattr(
+            "BotScanner.firewall.manager.enforce_tables",
+            lambda logger, sudo_password, backend: fake_logger.info("Enforce called")
+        )
+    
+        for backend in backends:
+            # Match production signature: (sudo_password, backend, flags)
+            orch = FirewallOrchestrator("pass", backend, flag)
+            orch.orchestrate()
+    
+        # Assert expected log messages are present
+        for expected in expected_msgs:
+            print(fake_logger.messages)
+&gt;           assert any(expected in msg for _, msg in fake_logger.messages)
+E           assert False
+E            +  where False = any(&lt;generator object test_orchestrator_enforce.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f8bce6a4820&gt;)
+
+tests/test_orchestrator_baseline.py:51: AssertionError</failure></testcase></testsuite></testsuites>

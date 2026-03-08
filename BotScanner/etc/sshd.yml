@@ -1,0 +1,107 @@
+sshd:
+  # -------------------------
+  # Identity
+  # -------------------------
+  name: "sshd"
+  description: "Secure Shell daemon configuration and hardening policy"
+  service:
+    unit: "ssh.service"
+    enabled: true
+    running: true
+
+  # -------------------------
+  # Binaries
+  # -------------------------
+  binaries:
+    sshd: "/usr/sbin/sshd"
+
+  # -------------------------
+  # Config Files
+  # -------------------------
+  configs:
+    - path: "/etc/ssh/sshd_config"
+      owner: "root"
+      group: "root"
+      mode: "0600"
+
+    - path: "/etc/ssh"
+      owner: "root"
+      group: "root"
+      mode: "0755"
+
+  # -------------------------
+  # Host Keys
+  # -------------------------
+  host_keys:
+    - path: "/etc/ssh/ssh_host_rsa_key"
+      owner: "root"
+      group: "root"
+      mode: "0600"
+
+    - path: "/etc/ssh/ssh_host_ed25519_key"
+      owner: "root"
+      group: "root"
+      mode: "0600"
+
+  # -------------------------
+  # Log Files
+  # -------------------------
+  logs:
+    - directory: "/var/log"
+      pattern: "auth.log*"
+      owner: "root"
+      group: "root"
+      mode: "0640"
+      recursive: false
+
+  # -------------------------
+  # Processes
+  # -------------------------
+  processes:
+    expected:
+      - "sshd"
+
+  # -------------------------
+  # Ports
+  # -------------------------
+  ports:
+    - port: 2222
+      protocol: "tcp"
+      required: true
+      open: true
+
+  # -------------------------
+  # SSHD Security Settings
+  # -------------------------
+  settings:
+    PermitRootLogin: "no"
+    PasswordAuthentication: "no"
+    PubkeyAuthentication: "yes"
+    ChallengeResponseAuthentication: "no"
+    X11Forwarding: "no"
+    AllowTcpForwarding: "no"
+    MaxAuthTries: 3
+    LoginGraceTime: 30
+    UsePAM: "yes"
+
+  # -------------------------
+  # Enforcement Toggles
+  # -------------------------
+  enforcement:
+    check_service: true
+    check_binaries: true
+    check_configs: true
+    check_host_keys: true
+    check_logs: true
+    check_processes: true
+    check_ports: true
+    check_settings: true
+
+  # -------------------------
+  # Variants
+  # -------------------------
+  variants:
+    debian:
+      log_pattern: "auth.log*"
+    rhel:
+      log_pattern: "secure*"

@@ -1,0 +1,115 @@
+services:
+  commands:
+    reload_cmd: "systemctl reload {{ daemons }}"
+    restart_cmd: "systemctl restart {{ daemons }}"
+    start_cmd: "systemctl start {{ daemons }}"
+    stop_cmd: "systemctl stop {{ daemons }}"
+    is_active_cmd: "systemctl is-active {{ daemons }}"
+    is_enabled_cmd: "systemctl is-enabled {{ daemons }}"
+    status_cmd: "systemctl status {{ daemons }}"
+
+  daemons:
+    apache2:
+      check: true
+      type: webserver
+      fallback:
+        - pkill httpd
+        - systemctl start apache2
+      enforcement:
+        check_ports: true
+        check_killmode: true
+        check_logs: true
+
+    dhcpd:
+      check: true
+      type: generic
+
+    firewalld:
+      check: true
+      type: firewallserver
+      enforcement:
+        mode: strict
+
+    mariadb:
+      check: true
+      type: databaseserver
+      enforcement:
+        check_socket: true
+        check_replication: true
+
+    named:
+      check: true
+      type: dnsserver
+      enforcement:
+        check_zonefiles: true
+        check_port53: true
+
+    nftables:
+      check: false
+
+    sshd:
+      check: true
+      type: generic
+
+    quicd:
+      check: false # enable if you actually deploy HTTP/3
+      type: generic
+      enforcement:
+        check_ports: true
+
+  ports:
+    http:
+      proto: [tcp]
+      port: "80"
+
+    https:
+      proto: [tcp]
+      port: "443"
+
+    http3:
+      proto: [udp]
+      port: "443"
+
+    dns:
+      proto: [tcp, udp]
+      port: "53"
+
+    ntp:
+      proto: [udp]
+      port: "123"
+
+    ssh:
+      proto: [tcp]
+      port: "22"
+
+    mysql:
+      proto: [tcp]
+      port: "3306"
+
+    postgresql:
+      proto: [tcp]
+      port: "5432"
+
+    smtp:
+      proto: [tcp]
+      port: "25"
+
+    smtp-submission:
+      proto: [tcp]
+      port: "587"
+
+    smtps:
+      proto: [tcp]
+      port: "465"
+
+    snmp:
+      proto: [udp, tcp]
+      port: "161"
+
+    syslog:
+      proto: [udp]
+      port: "514"
+
+    vnc-server:
+      proto: [tcp]
+      port: "5900-5902"

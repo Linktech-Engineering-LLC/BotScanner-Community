@@ -1,0 +1,222 @@
+kernel:
+  # -------------------------
+  # System Role
+  # -------------------------
+  # Valid roles:
+  #   - router      (forwards traffic, NAT, gateway)
+  #   - server      (no forwarding, hardened defaults)
+  #   - workstation (desktop/laptop)
+  #
+  role: "router"
+
+  # -------------------------
+  # Sysctl Parameters
+  # -------------------------
+sysctl:
+  # =========================
+  # IPv4 Parameters
+  # =========================
+
+  # --- IP Forwarding (role-dependent) ---
+  net.ipv4.ip_forward:
+    router: 1
+    server: 0
+    workstation: 0
+
+  # --- Reverse Path Filtering ---
+  net.ipv4.conf.all.rp_filter:
+    router: 1
+    server: 1
+    workstation: 1
+  net.ipv4.conf.default.rp_filter:
+    router: 1
+    server: 1
+    workstation: 1
+
+  # --- Redirect Handling ---
+  net.ipv4.conf.all.accept_redirects:
+    router: 0
+    server: 0
+    workstation: 0
+  net.ipv4.conf.default.accept_redirects:
+    router: 0
+    server: 0
+    workstation: 0
+  net.ipv4.conf.all.send_redirects:
+    router: 0
+    server: 0
+    workstation: 0
+  net.ipv4.conf.default.send_redirects:
+    router: 0
+    server: 0
+    workstation: 0
+
+  # --- Source Routing ---
+  net.ipv4.conf.all.accept_source_route:
+    router: 0
+    server: 0
+    workstation: 0
+  net.ipv4.conf.default.accept_source_route:
+    router: 0
+    server: 0
+    workstation: 0
+
+  # =========================
+  # IPv6 Parameters
+  # =========================
+
+  # --- IPv6 Enable/Disable ---
+  net.ipv6.conf.all.disable_ipv6:
+    router: 0
+    server: 0
+    workstation: 1
+  net.ipv6.conf.default.disable_ipv6:
+    router: 0
+    server: 0
+    workstation: 1
+
+  # --- IPv6 Forwarding (role-dependent) ---
+  net.ipv6.conf.all.forwarding:
+    router: 1
+    server: 0
+    workstation: 0
+
+  # --- Redirect Handling ---
+  net.ipv6.conf.all.accept_redirects:
+    router: 0
+    server: 0
+    workstation: 0
+  net.ipv6.conf.default.accept_redirects:
+    router: 0
+    server: 0
+    workstation: 0
+
+  # --- Source Routing ---
+  net.ipv6.conf.all.accept_source_route:
+    router: 0
+    server: 0
+    workstation: 0
+  net.ipv6.conf.default.accept_source_route:
+    router: 0
+    server: 0
+    workstation: 0
+
+  # --- Router Advertisements ---
+  net.ipv6.conf.all.accept_ra:
+    router: 0
+    server: 1
+    workstation: 1
+  net.ipv6.conf.default.accept_ra:
+    router: 0
+    server: 1
+    workstation: 1
+
+  # --- Kernel Hardening ---
+  kernel.kptr_restrict:
+    router: 2
+    server: 2
+    workstation: 1
+
+  kernel.dmesg_restrict:
+    router: 1
+    server: 1
+    workstation: 0
+
+  kernel.kexec_load_disabled:
+    router: 1
+    server: 1
+    workstation: 0
+
+  kernel.unprivileged_bpf_disabled:
+    router: 1
+    server: 1
+    workstation: 0
+
+  kernel.yama.ptrace_scope:
+    router: 1
+    server: 1
+    workstation: 0
+
+  # --- Coredump Policy ---
+  fs.suid_dumpable:
+    router: 0
+    server: 0
+    workstation: 0
+
+  kernel.core_uses_pid:
+    router: 1
+    server: 1
+    workstation: 1
+
+  # --- ASLR ---
+  kernel.randomize_va_space:
+    router: 2
+    server: 2
+    workstation: 2
+
+  # -------------------------
+  # Kernel Modules
+  # -------------------------
+  modules:
+    required:
+      router:
+        - nf_conntrack
+        - nf_nat
+        - nf_defrag_ipv4
+        - nf_defrag_ipv6
+        - ip_tables
+        - ip6_tables
+
+      server:
+        - nf_conntrack
+
+      workstation:
+        - nf_conntrack
+
+    forbidden:
+      - usb_storage
+      - firewire_ohci
+      - firewire_core
+      - thunderbolt
+      - bluetooth
+
+  # -------------------------
+  # Filesystem Hardening
+  # -------------------------
+  filesystem:
+    restrict_proc:
+      enabled: true
+      mode: "hidepid=2,gid=proc"
+
+    mount_options:
+      - path: "/tmp"
+        options: ["nodev", "nosuid", "noexec"]
+
+      - path: "/var/tmp"
+        options: ["nodev", "nosuid", "noexec"]
+
+      - path: "/home"
+        options: ["nodev"]
+
+  # -------------------------
+  # Enforcement Toggles
+  # -------------------------
+  enforcement:
+    check_sysctl: true
+    check_modules_required: true
+    check_modules_forbidden: true
+    check_filesystem: true
+    check_mount_options: true
+    check_proc_restrictions: true
+
+  # -------------------------
+  # Variants (Optional)
+  # -------------------------
+  variants:
+    debian:
+      sysctl_overrides:
+        kernel.yama.ptrace_scope: 1
+
+    rhel:
+      sysctl_overrides:
+        kernel.kexec_load_disabled: 1

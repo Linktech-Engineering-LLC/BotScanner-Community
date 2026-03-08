@@ -1,0 +1,160 @@
+botscanner:
+  name: BotScanner
+  version: "0.3.0"
+  schema_version: "1.0"
+
+  metadata:
+    language: python
+    runtime_version: "3.12"
+    license: "DEV-LICENSE-2025" # DEV=Development, COM=Community, PRO=Professinal, ENT=Enterprise
+    description: "Network Bot and Threat Scanner with Firewall Enforcement"
+
+  enforcement:
+    mode: strict # strict | audit-only | hybrid
+    supported:
+      - strict
+      - audit-only
+      - hybrid
+
+    drift:
+      detect: true # always detect drift
+      classify: true # categorize drift (critical, noncritical)
+      cross_drift: true # compare baseline ↔ nxt ↔ live
+
+    apply:
+      strict:
+        enforce_all: true
+        enforce_critical: true
+        enforce_noncritical: true
+
+      audit-only:
+        enforce_all: false
+        enforce_critical: false
+        enforce_noncritical: false
+
+      hybrid:
+        enforce_all: false
+        enforce_critical: true
+        enforce_noncritical: false
+
+    lifecycle:
+      baseline:
+        update_on:
+          - strict
+          - hybrid
+
+      nxt:
+        save_on:
+          - strict
+          - hybrid
+        load_on:
+          - audit-only
+          - hybrid
+
+  backends:
+    firewall:
+      supported:
+        - nftables
+        - firewalld
+        - ufw
+      default: nftables
+      allow_multiple_active: true
+      compare_families:
+        - nftables
+        - firewalld
+
+logging:
+  enabled: true
+  path: "{{ LOG_DIR }}/{{ project_name }}.log"
+  rotate_logs: true
+  max_age_days: 7
+  max_size: 200MB
+  archive: true
+  mode: tgz
+  backup_count: 5
+  log_level: debug
+  console: true
+  color: true
+  debug_banner: false
+  custom_levels:
+    AUDIT: 25
+    LIFECYCLE: 26
+    DEBUG: 10
+    INFO: 20
+    WARNING: 30
+    ERROR: 40
+    CRITICAL: 50
+
+paths:
+  install_dir: "/mnt/Mom/Scripts/Python/BotScanner/BotScanner"
+  config_dir: "{{ install_dir }}/etc"
+  data_dir: "{{ install_dir }}/var/lib"
+  cache_dir: "{{ install_dir }}/var/cache"
+  log_dir: "{{ install_dir }}/var/log"
+  pid_dir: "{{ install_dir }}/var/run"
+  temp_dir: "{{ install_dir }}/var/tmp"
+
+  features:
+    enable_thread_checks: true
+    enable_log_permissions: true
+    enable_service_validation: true
+
+flags:
+  # -------------------------
+  # Execution Context
+  # -------------------------
+  ROOT_MODE: false
+  CI_MODE: true
+  CRON_MODE: false
+  VERBOSE: true
+  ENABLE_DRY_RUN: false
+
+  # -------------------------
+  # Output / Reporting
+  # -------------------------
+  ENABLE_LOGGING: true
+  ENABLE_SUMMARY: true
+  EXPORT_JSON: false
+  EXPORT_HTML: false
+  INCLUDE_PYTHON_VERSION: true
+
+  # -------------------------
+  # Firewall
+  # -------------------------
+  IPSET_MODE: false # tied to ENFORCE_MANAGER / ENFORCE_KERNEL
+  FIREWALL_BASE: false # baseline rules applied
+  FIREWALL_STATUS: true # independent toggle for firewall health checks
+  FIREWALL_DRIFT: false # drift detection
+  CROSS_DRIFT: false
+  ENABLE_NFT: false
+  # -------------------------
+  # Enforcement Controls
+  # -------------------------
+  ENFORCE_MANAGER: false
+  ENFORCE_KERNEL: true
+
+  # -------------------------
+  # Server Checks
+  # -------------------------
+  SERVER_STATUS: true
+  SERVER_DEEP: false
+  SERVER_LOG_SCAN: false
+
+  custom_flags:
+    DEBUG_TRACE: true
+    MY_EXPERIMENTAL_MODE: false
+
+vault:
+  vault_path: "{{ install_dir }}/var/lib/vault.yml"
+  password_file: "{{ install_dir }}/var/lib/.secrets/password"
+  encrypted: false
+  use_env_variable: true
+  password_env_variable: "BOTSCANNER_VAULT_PASSWORD_FILE"
+  vault_env_variable: "BOTSCANNER_VAULT_PATH"
+  mask: 600
+  key: "all"
+
+runtime:
+  user: "botscanner"
+  group: "botscanner"
+  umask: "027"

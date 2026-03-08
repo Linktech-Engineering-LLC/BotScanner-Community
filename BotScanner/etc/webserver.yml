@@ -1,0 +1,110 @@
+webserver:
+  # -------------------------
+  # Identity
+  # -------------------------
+  name: "webserver"
+  description: "Primary HTTP/HTTPS web service"
+  type: "apache2" # or apache, caddy, lighttpd, etc.
+
+  # -------------------------
+  # Service / Unit
+  # -------------------------
+  service:
+    unit: "apache2.service"
+    enabled: true
+    running: true
+    KillMode: "control-group"
+
+  # -------------------------
+  # Binaries
+  # -------------------------
+  binaries:
+    apache2: "/usr/sbin/apache2"
+    apachectl: "/usr/sbin/apachectl"
+
+  # -------------------------
+  # Config Files
+  # -------------------------
+  configs:
+    - path: "/etc/apache2/apache2.conf"
+      owner: "root"
+      group: "root"
+      mode: "0644"
+
+    - path: "/etc/apache2/ports.conf"
+      owner: "root"
+      group: "root"
+      mode: "0644"
+
+    - path: "/etc/apache2/sites-enabled"
+      owner: "root"
+      group: "root"
+      mode: "0755"
+
+    - path: "/etc/apache2/mods-enabled"
+      owner: "root"
+      group: "root"
+      mode: "0755"
+
+  # -------------------------
+  # Log Files
+  # -------------------------
+  log_directory:
+    path: "/var/log/apache2"
+    owner: "root"
+    group: "root"
+    mode: "0750"
+
+  logs:
+    - directory: "/var/log/apache2"
+      pattern: "access_log*"
+      variants:
+        - owner: "root"
+          group: "root"
+          mode: "0444"
+        - owner: "www-data"
+          group: "adm"
+          mode: "0640"
+      recursive: false
+
+  # -------------------------
+  # Threads / Processes
+  # -------------------------
+  processes:
+  variants:
+    prefork:
+      expected:
+        - "apache2"
+        - "httpd-prefork"
+    worker:
+      expected:
+        - "apache2"
+        - "apache2"
+    event:
+      expected:
+        - "apache2"
+        - "apache2"
+
+  # -------------------------
+  # Ports / Protocols
+  # -------------------------
+  ports:
+    - port: 80
+      protocol: "tcp"
+      required: true
+      enabled: false
+    - port: 443
+      protocol: "tcp"
+      required: true
+      enabled:
+
+  # -------------------------
+  # Enforcement Toggles
+  # -------------------------
+  enforcement:
+    check_service: true
+    check_binaries: true
+    check_configs: true
+    check_logs: true
+    check_processes: true
+    check_ports: true

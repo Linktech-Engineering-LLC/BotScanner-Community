@@ -1,0 +1,153 @@
+database:
+  # -------------------------
+  # Active Backend
+  # -------------------------
+  backend: "mariadb"
+
+  # -------------------------
+  # Identity
+  # -------------------------
+  name: "database"
+  description: "Database server configuration and hardening policy"
+
+  # -------------------------
+  # Service (MariaDB)
+  # -------------------------
+  service:
+    unit:
+      required:
+        - "mariadb.service"
+      optional:
+        - "mysql.service" # Some distros still ship this alias
+    enabled: true
+    running: true
+
+  # -------------------------
+  # Binaries
+  # -------------------------
+  binaries:
+    server:
+      required:
+        - "/usr/sbin/mariadbd" # Canonical MariaDB server binary
+      optional:
+        - "/usr/sbin/mysqld" # MySQL alias (deprecated in future MariaDB)
+    client:
+      required:
+        - "/usr/bin/mariadb" # Canonical MariaDB client
+      optional:
+        - "/usr/bin/mysql" # MySQL alias
+        - "/usr/bin/mysqladmin" # MySQL admin alias
+
+  # -------------------------
+  # Config Files
+  # -------------------------
+  configs:
+    - path: "/etc/my.cnf"
+      owner: "root"
+      group: "root"
+      mode: "0644"
+
+    - path: "/etc/my.cnf.d"
+      owner: "root"
+      group: "root"
+      mode: "0755"
+
+    - path: "/etc/mysql/my.cnf" # MySQL-style alias path
+      owner: "root"
+      group: "root"
+      mode: "0644"
+      optional: true
+
+  # -------------------------
+  # Data Directory
+  # -------------------------
+  data:
+    directory: "/var/lib/mysql"
+    owner: "mysql"
+    group: "mysql"
+    mode: "0750"
+
+  # -------------------------
+  # Logs
+  # -------------------------
+  logs:
+    - directory: "/var/log/mysql"
+      pattern: "*.log"
+      owner: "mysql"
+      group: "mysql"
+      mode: "0640"
+      recursive: false
+
+    - directory: "/var/log/mariadb" # Some distros use this instead
+      pattern: "*.log"
+      owner: "mysql"
+      group: "mysql"
+      mode: "0640"
+      recursive: false
+      optional: true
+
+  # -------------------------
+  # Sockets
+  # -------------------------
+  sockets:
+    required:
+      - "/var/run/mysqld/mysqld.sock"
+    optional:
+      - "/run/mysqld/mysqld.sock" # Alternate path on some systems
+
+  # -------------------------
+  # Processes
+  # -------------------------
+  processes:
+    expected:
+      - "mariadbd"
+    optional:
+      - "mysqld" # Alias process name
+
+  # -------------------------
+  # Ports
+  # -------------------------
+  ports:
+    - port: 3306
+      protocol: "tcp"
+      required: true
+      open: true
+
+  # -------------------------
+  # Security Settings
+  # -------------------------
+  settings:
+    ssl_enabled: true
+    local_socket_mode: "0770"
+    require_authentication: true
+
+  # -------------------------
+  # Enforcement Toggles
+  # -------------------------
+  enforcement:
+    check_service: true
+    check_binaries: true
+    check_configs: true
+    check_data: true
+    check_logs: true
+    check_sockets: true
+    check_processes: true
+    check_ports: true
+    check_settings: true
+
+  # -------------------------
+  # Variants
+  # -------------------------
+  variants:
+    mariadb:
+      service_unit: "mariadb.service"
+      config_path: "/etc/my.cnf"
+      data_path: "/var/lib/mysql"
+      port: 3306
+
+    postgres:
+      active: false
+      service_unit: "postgresql.service"
+      config_path: "/var/lib/pgsql/data/postgresql.conf"
+      data_path: "/var/lib/pgsql/data"
+      port: 5432

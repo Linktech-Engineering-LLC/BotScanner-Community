@@ -1,0 +1,1 @@
+from .botscanner_parser import ScriptParser

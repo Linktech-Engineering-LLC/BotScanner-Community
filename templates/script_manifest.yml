@@ -1,0 +1,38 @@
+# templates/script_manifest.yml
+# Created: 2025-12-24
+# Modified: 2025-12-24
+# Purpose: Track v1 scripts, their roles, and migration status with checklist
+
+scripts:
+  - name: main.py
+    purpose: Original entry point, orchestration logic
+    migration_status: archived
+    notes: Replaced by modular entry point
+    checklist:
+      archived_datestamp: true
+      removed_from_active_use: true
+
+  - name: VaultLoader.py
+    purpose: YAML loader/parser
+    migration_status: refactored
+    notes: Dict-like fixes and bytes/str parsing resolved
+    checklist:
+      refactor_dict_methods: false
+      fix_bytes_str_parsing: false
+      add_headers: false
+
+  - name: utils/flags.py
+    purpose: Flag definitions
+    migration_status: pending_migration
+    notes: Move to config/flags.py and drive from hosts.yml
+    checklist:
+      wrap_existing_flags: false
+      migrate_to_config_flags: false
+      update_hosts_references: false
+
+integration_tasks:
+  update_imports: false
+  validate_service_mapping: false
+  test_hybrid_mode: false
+  confirm_manifest_status: false
+  remove_obsolete_flags: false

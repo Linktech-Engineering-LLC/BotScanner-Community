@@ -1,0 +1,14 @@
+drift:
+  datestamp: true # include timestamp in filenames and/or headers
+  rotate: true # enable rotation logic at all
+  rotation:
+    link: true # maintain symlink or previous_drift pointer
+    max_count: 10 # keep at most 10 drift files
+    max_age_days: 30 # or expire after 30 days
+cross_drift:
+  datestamp: true # include timestamp in filenames and/or headers
+  rotate: true # enable rotation logic at all
+  rotation:
+    link: true # maintain symlink or previous_drift pointer
+    max_count: 5 # keep at most 5 drift files
+    max_age_days: 30 # or expire after 30 days

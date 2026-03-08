@@ -1,0 +1,4 @@
+geoip2:
+  asn_reader: "/var/lib/GeoIP/GeoLite2-ASN.mmdb"
+  city_reader: "/var/lib/GeoIP/GeoLite2-City.mmdb"
+  country_reader: "/var/lib/GeoIP/GeoLite2-Country.mmdb"

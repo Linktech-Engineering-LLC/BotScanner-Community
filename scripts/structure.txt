@@ -1,0 +1,435 @@
+applications:
+  BotScanner:
+    language: python
+    version: '3.12'
+    enforcement_mode: strict
+    backend: nftables
+    defaults:
+      BASE_DIR: '{{ Path(__file__).resolve().parents[2] }}'
+      DATA_DIR: '{{ BASE_DIR }}/data'
+      LOG_DIR: '{{ BASE_DIR }}/Logs'
+      log_level: info
+    flags:
+      ENABLE_COLOR: true
+      ROOT_MODE: false
+      ENABLE_LOGGING: true
+      ENABLE_SUMMARY: true
+      CI_MODE: true
+      VERBOSE: true
+      CRON_MODE: false
+      ENABLE_DRY_RUN: false
+      INCLUDE_PYTHON_VERSION: true
+      EXPORT_JSON: false
+      EXPORT_HTML: false
+      ANSIBLE_CFG: true
+      ANSIBLE_HOST: false
+      ANSIBLE_MODE: false
+      VAULT_MODE: false
+      IPSET_MODE: false
+      SERVER_STATUS: true
+      SERVER_LOG_SCAN: false
+      FIREWALL_BASE: false
+      FIREWALL_STATUS: true
+      FIREWALL_DRIFT: false
+      ENFORCE_MANAGER: false
+      ENFORCE_KERNEL: false
+      CROSS_DRIFT: false
+    services:
+    - ssh
+    - http
+    - https
+    - dns
+    - ntp
+backend_config:
+  nftables:
+    table: nftables
+    sets:
+    - botblock
+    - public
+    - private
+    - local
+    - trusted
+    chains:
+      input: input
+      forward: forward
+      output: output
+      drop: drop
+      accept: accept
+  firewalld:
+    zones:
+    - public
+    - trusted
+    - internal
+    - private
+    services:
+    - ssh
+    - http
+    - https
+  ufw:
+    default_policy:
+      incoming: deny
+      outgoing: allow
+      routed: deny
+    services:
+    - ssh
+    - http
+    - https
+groups:
+  local:
+    description: Loopback and same-host traffic
+    default_policy:
+      incoming: deny
+      outgoing: allow
+    allow:
+    - loopback
+    deny: []
+  private:
+    description: Home/work LAN zone
+    default_policy:
+      incoming: deny
+      outgoing: allow
+    allow:
+    - ssh
+    - http
+    - https
+    - smb
+    - mdns
+    deny: []
+  trusted:
+    description: Privileged internal networks (VPN, mgmt VLAN)
+    default_policy:
+      incoming: allow
+      outgoing: allow
+    allow:
+    - ssh
+    - http
+    - https
+    - metrics
+    - db
+    deny: []
+  public:
+    description: Untrusted external networks (Internet)
+    default_policy:
+      incoming: deny
+      outgoing: allow
+    allow:
+    - http
+    - https
+    - ssh
+    deny: []
+  botblock:
+    description: Known malicious or blocked sources
+    default_policy:
+      incoming: deny
+      outgoing: deny
+    allow: []
+    deny:
+    - all
+all:
+  bkup-fldr:
+    path: /mnt/Mom/Backups
+  children:
+    linux:
+      services:
+        command: systemctl
+        status: is-active
+      firewall:
+        manager: &id001
+          name: firewalld
+          command: firewall-cmd
+        kernel: &id002
+          name: nftables
+          command: nft
+      web:
+        server: apache2
+        logs: /var/log/apache2
+      opensuse:
+        packages:
+          check: zypper refresh && zypper patch-check --with-optional
+          refresh: zypper refresh
+          update: zypper --non-interactive up --auto-agree-with-licenses --replacefiles
+          clean: zypper clean
+          orphans: zypper packages --orphaned
+          list: zypper list-updates
+          reboot: zypper needs-rebooting
+        port: 2222
+        hosts:
+          Suse-Roll-01:
+            virt_host: Mom
+            services:
+            - mysql
+          Suse-Roll-02:
+            virt_host: DualBoot-Suse
+            services:
+            - mysql
+          Suse-Beta-01:
+            virt_host: Lab-Suse-01
+            services:
+            - mysql
+          DualBoot-Suse:
+            services:
+            - mysql
+          Dad:
+            firewall:
+              manager: *id001
+              kernel: *id002
+              dmz:
+                zone: public
+                services:
+                - apache2-ssl
+                - dns
+                - https
+                - ntp
+                ports:
+                - 2222/tcp
+                iface:
+                  name: eth1
+                  address:
+                    primary: 104.128.33.26
+                    cidr: 104.128.33.24/29
+                    gateway: 104.128.33.25
+              internal:
+                zone: home
+                iface:
+                  name: br0
+                  address:
+                    primary: 192.168.0.1
+                    secondary: 192.168.0.201
+                    cidr: 192.168.0.0/24
+              routing:
+              - source: 192.168.0.1
+                destination: 192.168.0.0/24
+                via: br0
+              - source: 192.168.0.2
+                destination: 10.129.120.0/24
+                via: br0
+              - source: 192.168.0.2
+                destination: 10.145.156.0/24
+                via: br0
+              - source: 104.128.33.25
+                destination: 0.0.0.0/0
+                via: eth1
+              allow:
+              - 104.128.33.26/32
+              - 104.128.33.27/32
+              - 104.128.33.28/32
+              - 104.128.33.29/32
+              - 192.168.0.0/24
+              - 10.145.156.0/24
+              geoip2:
+                asn_readr: /var/lib/GeoIP/GeoLite2-ASN.mmdb
+                city_readr: /var/lib/GeoIP/GeoLite2-City.mmdb
+                country_readr: /var/lib/GeoIP/GeoLite2-Country.mmdb
+            services:
+            - named
+            - dhcpd
+            - apache2
+            - mysql
+          Mom:
+            path: /home/nfs1/Backups
+            services:
+            - named
+            - dhcpd
+            - mysql
+            firewall:
+              manager: *id001
+              kernel: *id002
+              allow: 104.128.33.26/29
+          GateServer:
+            services:
+            - mysql
+          Suse-Beta-16:
+            virt_host: Lab-Suse-01
+            services:
+            - mysql
+          Suse-Weed-01:
+            virt_host: DualBoot-Suse
+            services:
+            - mysql
+          Lab-Suse-01:
+            services:
+            - apache2
+            - nagios
+            - mysql
+      ubuntu:
+        packages:
+          check: apt update && apt list --upgradeable
+          refresh: apt update
+          update: apt upgrade -y
+          full-update: apt full-upgrade -y
+          clean: apt autoremove -y
+          list: apt list --upgradeable
+          reboot: test -f /var/run/reboot-required
+        firewall:
+          manager:
+            name: ufw
+            command: ufw
+          kernel:
+            tables: iptables
+            command: iptables
+        hosts:
+          ub25-desk-01:
+            virt_host: GateServer
+            services:
+            - mysql
+          ub25-srvr-01:
+            virt_host: GateServer
+            services:
+            - mysql
+      redhat:
+        packages:
+          check: dnf check-update
+          refresh: dnf check-update
+          update: dnf upgrade -y
+          clean: dnf clean all
+          list: dnf list updates
+          reboot: needs-restarting -r
+        hosts:
+          rh95-dev-01:
+            virt_host: Dad
+            services:
+            - mysql
+          rh10-dev-01:
+            alias: localhost
+            connection: local
+            virt_host: Dad
+            services:
+            - mysql
+    dbservers:
+      age: 7
+      port: 3306
+      mariadb:
+        servers:
+          opensuse: {}
+      oracle:
+        servers:
+          rh95-dev-01: {}
+      postgresql:
+        servers: {}
+patterns:
+  bots:
+  - /cgi-bin/luci
+  - /admin
+  - /wp-login\.php
+  - /\.env
+  - /phpmyadmin
+  - /shell
+  - /HNAP1
+  - /config\.inc\.php
+  - /administrator
+  - /user/login
+  - /xmlrpc\.php
+  - /login\b
+  - /config\.php
+  - /web\.config
+  - /crossdomain\.xml
+  - /server-status
+  - /backup\.zip
+  - /db\.sql
+  - /dump\.sql
+  - /backup\.tar\.gz
+  - /boaform/admin/formLogin
+  - /hudson
+  - /jenkins/login
+  - /wp-content/plugins/
+  - /wp-content/themes/
+  - /vendor/phpunit
+  - /console
+  suspicious:
+  - /test
+  - /debug
+  - /staging
+  - /old
+  - /tmp
+  - /private
+  - /hidden
+  - /dev
+  - /api
+  - /api/v1
+  - /api/v2
+  - \.\./
+  - '%2e%2e%2f'
+  - '%2e%2e/'
+  - =?
+  - =/
+  - =%2e
+  - =%2f
+  - \.bak
+  - \.old
+  - \.tmp
+  - \.swp
+  - /robots.txt
+  - /favicon.ico
+  ignore:
+  - /health
+  - /healthcheck
+  - /status
+  - /metrics
+  - /ready
+  - /live
+  - /static/
+  - /assets/
+  - /css/
+  - /js/
+  - /images/
+  - /fonts/
+  - /favicon.ico
+  - /robots.txt
+  - /sitemap.xml
+  - /internal/heartbeat
+  - /internal/ping
+os_detection:
+  linux:
+  - '*ubuntu*'
+  - '*debian*'
+  - '*suse*'
+  windows:
+  - '*win*'
+  redhat:
+  - '*rhel*'
+  - '*centos*'
+distro_detection:
+  opensuse:
+  - '*opensuse*'
+  - '*tumbleweed*'
+  ubuntu:
+  - '*ubuntu*'
+  redhat:
+  - '*rhel*'
+  - '*fedora*'
+zone_patterns:
+  private:
+  - 192.168.*
+  - 10.*
+  public:
+  - '*'
+service_ports:
+  apache2:
+  - 80/tcp
+  - 443/tcp
+  mysql:
+  - 3306/tcp
+  dns:
+  - 53/tcp
+  - 53/udp
+backend_detection:
+  ufw:
+  - ubuntu
+  firewalld:
+  - redhat
+  - centos
+  nftables:
+  - opensuse
+  - debian
+  - ubuntu
+  iptables:
+  - ubuntu
+  - debian
+geoip_groups:
+  allowed_asn:
+  - 12345
+  - 67890
+  blocked_countries:
+  - CN
+  - RU
+

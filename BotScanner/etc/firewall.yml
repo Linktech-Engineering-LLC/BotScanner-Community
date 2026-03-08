@@ -1,0 +1,404 @@
+firewall:
+  # -------------------------
+  # Identity
+  # -------------------------
+  name: "firewall"
+  backend: "nftables"
+  description: "System firewall policy and enforcement metadata"
+  role: "server" # Host can be either a server or workstation
+  router: true # Can be false for a workstation or either for a server
+  nat: false
+  # -------------------------
+  # Backend Definitions
+  # -------------------------
+  backends:
+    kernel:
+      priority:
+        - nftables
+    manager:
+      priority:
+        - firewalld
+        - ufw
+    nftables:
+      owner: "kernel"
+      command: "nft"
+      capture:
+        - label: "ruleset"
+          cmd: "list ruleset"
+      parse: "nftables"
+    firewalld:
+      owner: "manager"
+      command: "firewall-cmd"
+      capture:
+        - label: "zones"
+          cmd: "--list-all-zones"
+        - label: "services"
+          cmd: "--list-services"
+        - label: "direct_rules"
+          cmd: "--direct --get-all-rules"
+        - label: "nft_ruleset"
+          cmd: "!nft list ruleset"
+      parse: "zones"
+    ufw:
+      owner: "manager"
+      command: "ufw"
+      capture:
+        - label: "status"
+          cmd: "status numbered"
+        - label: "verbose"
+          cmd: "status verbose"
+        - label: "raw"
+          cmd: "show raw"
+        - label: "defaults"
+          cmd: "!cat /etc/default/ufw"
+      parse: "ufw"
+  # -------------------------
+  # Table Definition
+  # -------------------------
+  table:
+    family: "inet"
+    name: "{{ project_name }}"
+
+  # -------------------------
+  # Required Sets
+  # -------------------------
+  sets:
+    # =========================
+    # Botblock Zone
+    # =========================
+    - name: "botblock"
+      zone: "botblock"
+      kind: synthetic
+      supports_ipv6: true
+      flags: ["interval"]
+      timeout: "1h" # default element timeout
+      gc-interval: "60s"
+      required: true
+      elements: []
+
+    # =========================
+    # Public Zone
+    # =========================
+    - name: "public"
+      zone: "public"
+      kind: interface
+      supports_ipv6: false
+      flags: ["interval"]
+      required: true
+      services:
+        - https # TCP 443
+        - named # DNS (53/tcp+udp)
+        - ntp # UDP 123
+      ports:
+        - 2222 # custom SSH port
+      elements: []
+
+    # =========================
+    # Trusted Zone
+    # =========================
+    - name: "trusted"
+      zone: "trusted"
+      kind: synthetic
+      supports_ipv6: false
+      flags: []
+      required: true
+      source: yaml # yaml is default | file | vault
+      elements:
+        - { addr: "192.168.0.86", timeout: null }
+        - { addr: "192.168.0.72", timeout: null }
+    # =========================
+    # Local Zone
+    # =========================
+    - name: "local"
+      zone: "local"
+      kind: interface
+      supports_ipv6: false
+      flags: ["interval"]
+      required: true
+      elements: []
+
+    # ===========================
+    # Home Zone
+    # ===========================
+    - name: "home"
+      zone: "home"
+      kind: interface
+      supports_ipv6: false
+      flags: ["interval"]
+      required: true
+      services:
+        - http # TCP 80
+        - http3 # UDP 443 (QUIC)
+        - https # TCP 443
+        - ntp # UDP 123
+        - dns # TCP/UDP 53
+        - dhcp # UDP 67/68
+        - imap # TCP 143
+        - kdeconnect # TCP/UDP 1714-1764
+        - mdns # UDP 5353
+        - mysql # TCP 3306
+        - nfs # TCP/UDP 2049
+        - nfs3 # legacy NFS v3
+        - postgresql # TCP 5432
+        - samba-client # TCP/UDP 137-139, 445
+        - smtp # TCP 25
+        - smtp-submission # TCP 587
+        - smtps # TCP 465
+        - snmp # UDP 161/162
+        - ssh # TCP 22 (or 2222 if custom)
+        - svn # TCP 3690
+        - syslog # UDP 514
+        - vnc-server # TCP 5900+
+      ports:
+        - 111/tcp
+        - 161/tcp
+        - 662/tcp
+        - 875/tcp
+        - 892/tcp
+        - 2222/tcp
+        - 5666/tcp
+        - 5900-5902/tcp
+        - 32803/tcp
+        - 111/udp
+        - 161/udp
+        - 662/udp
+        - 875/udp
+        - 892/udp
+        - 32769/udp
+      elements: [] # e.g. 192.168.1.0/24
+
+  # -------------------------
+  # Required Chains
+  # -------------------------
+  chains:
+    - name: "input"
+      hook: "input"
+      type: "filter"
+      priority: 0
+      required: true
+
+    - name: "forward"
+      hook: "forward"
+      type: "filter"
+      priority: 0
+      required: true
+
+    - name: "output"
+      hook: "output"
+      type: "filter"
+      priority: 0
+      required: false
+
+  # -------------------------
+  # Logical Rules (backend expands to v4/v6)
+  # -------------------------
+  rules:
+    # ===========================
+    # Input chain (traffic to host)
+    # ===========================
+    - chain: "input"
+      src_zone: "trusted"
+      action: "accept"
+
+    - chain: "input"
+      src_zone: "local"
+      action: "accept"
+
+    - chain: "input"
+      src_zone: "home"
+      action: "accept"
+
+    # Botblock (input)
+    - chain: "input"
+      src_zone: "botblock"
+      action: "drop"
+      log_prefix: "BOTBLOCK"
+      rate_limit: "10/second"
+
+    # Default deny (input)
+    - chain: "input"
+      action: "drop"
+      log_prefix: "DEFAULT"
+      rate_limit: "10/second"
+
+    # ===========================
+    # Forward chain (routed traffic)
+    # ===========================
+
+    # Home <-> Public
+    - chain: "forward"
+      src_zone: "home"
+      dst_zone: "public"
+      action: "accept"
+
+    - chain: "forward"
+      src_zone: "public"
+      dst_zone: "home"
+      action: "accept"
+
+    # Public <-> Trusted
+    - chain: "forward"
+      src_zone: "public"
+      dst_zone: "trusted"
+      action: "accept"
+
+    - chain: "forward"
+      src_zone: "trusted"
+      dst_zone: "public"
+      action: "accept"
+
+    # Local <-> Public
+    - chain: "forward"
+      src_zone: "local"
+      dst_zone: "public"
+      action: "accept"
+
+    - chain: "forward"
+      src_zone: "public"
+      dst_zone: "local"
+      action: "accept"
+
+    # Local <-> Trusted
+    - chain: "forward"
+      src_zone: "local"
+      dst_zone: "trusted"
+      action: "accept"
+
+    - chain: "forward"
+      src_zone: "trusted"
+      dst_zone: "local"
+      action: "accept"
+
+    # Home <-> Local
+    - chain: "forward"
+      src_zone: "home"
+      dst_zone: "local"
+      action: "accept"
+
+    - chain: "forward"
+      src_zone: "local"
+      dst_zone: "home"
+      action: "accept"
+
+    # Home <-> Trusted
+    - chain: "forward"
+      src_zone: "home"
+      dst_zone: "trusted"
+      action: "accept"
+
+    - chain: "forward"
+      src_zone: "trusted"
+      dst_zone: "home"
+      action: "accept"
+
+    # Botblock (forward)
+    - chain: "forward"
+      src_zone: "botblock"
+      action: "drop"
+      log_prefix: "BOTBLOCK"
+      rate_limit: "10/second"
+      counter: true
+
+    # Default deny (forward)
+    - chain: "forward"
+      action: "drop"
+      log_prefix: "DEFAULT"
+      rate_limit: "10/second"
+
+  # -------------------------
+  # Interfaces
+  # -------------------------
+
+  ifaces:
+    - names: [lo]
+      zone: "local"
+    - names: [eth1, eno2, enp3s0]
+      zone: "public"
+    - names: [br0]
+      slaves: [eth0, vnet0, vnet1]
+      zone: "home"
+
+  # -------------------------
+  # Enforcement Toggles
+  # -------------------------
+
+  enforcement:
+    check_backend: true
+    check_table: true
+    check_sets: true
+    check_chains: true
+    check_rules: true
+    check_drift: true
+    enforce_missing_sets: true
+    enforce_missing_chains: true
+    enforce_table_rebuild: false
+
+  # -------------------------
+  # Variants (optional)
+  # -------------------------
+  variants:
+    debian:
+      backend: "nftables"
+      table_name: "botscanner"
+    rhel:
+      backend: "firewalld"
+      table_name: "public"
+
+ipset:
+  population: static # global default: static | dynamic | mixed
+
+  sets:
+    - name: botblock
+      type: ipv4_addr
+      family: inet
+      flags: [interval, timeout]
+      population: dynamic # overrides global default
+      timeout: 86400 # optional: per-set timeout in seconds
+      description: "Dynamic blocklist populated from logs and scanners"
+
+    - name: botblock_v6
+      type: ipv6_addr
+      family: inet
+      flags: [interval, timeout]
+      population: dynamic
+      timeout: 86400
+      description: "IPv6 dynamic blocklist"
+
+    - name: trusted_v4
+      type: ipv4_addr
+      family: inet
+      flags: [interval]
+      population: static
+      entries:
+        - { addr: 192.168.0.81/32, timeout: null }
+        - 192.168.1.10/32
+        - 192.168.1.11/32
+      description: "Explicit trusted hosts"
+
+    - name: trusted_v6
+      type: ipv6_addr
+      family: inet
+      flags: [interval]
+      population: static
+      entries: []
+      description: "Trusted IPv6 hosts (none defined)"
+
+    - name: local
+      type: ipv4_addr
+      family: inet
+      flags: [interval]
+      population: mixed
+      derive_from:
+        - interfaces # BotScanner will enumerate interfaces and derive subnets
+        - gateways
+      description: "Local subnets derived from live system state"
+
+    - name: local_v6
+      type: ipv6_addr
+      family: inet
+      flags: [interval]
+      population: mixed
+      derive_from:
+        - interfaces
+        - gateways
+      description: "IPv6 local subnets"

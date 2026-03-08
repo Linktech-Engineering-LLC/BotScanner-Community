@@ -1,0 +1,41 @@
+# Python build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Editor/IDE metadata
+.vscode/
+.idea/
+*.swp
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+Logs/
+*.log
+tmp/
+*.tmp
+
+# Dependency caches
+.mypy_cache/
+.pytest_cache/
+dist/
+build/
+*.egg-info/
+
+# SVN metadata (usually managed automatically)
+.svn/
+
+# Local secrets / overrides
+.env
+
+# Local Folders 
+archive
