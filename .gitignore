@@ -1,16 +1,82 @@
+# ============================
+# BotScanner Community Edition
+# Unified .gitignore
+# ============================
+
+# --- Version control / tooling ---
 .svn/
-.venv/
-.vscode/
+
+# --- Python bytecode / cache ---
 __pycache__/
-archive/
-data/
+*.py[cod]
+*$py.class
+
+# --- Virtual environments ---
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Local editor / workspace ---
+.vscode/
+*.code-workspace
+
+# --- Runtime data (never commit) ---
 Logs/
-*.jsonl
-BotScanner.egg-info/
-BotScanner.code-workspace
+data/
+archive/
 var/
-# Ignore the top-level docs folder
+*.log
+*.jsonl
+test.dat
+
+# --- Build / packaging ---
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+develop-eggs/
+sdist/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- Tools / caches ---
+.cache/
+.tox/
+.nox/
+.pytest_cache/
+.hypothesis/
+.coverage
+.coverage.*
+*.cover
+*.py.cover
+
+# --- Documentation build artifacts ---
+docs/_build/
+
+# --- Misc Python tools ---
+.pdm-python
+.pdm-build/
+.pixi
+__pypackages__/
+.pybuilder/
+target/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+cython_debug/
+
+# --- Ignore top-level docs folder ---
 docs/
 
-# But DO NOT ignore the nested docs folder
+# --- BUT keep nested BotScanner docs ---
 !BotScanner/docs/
