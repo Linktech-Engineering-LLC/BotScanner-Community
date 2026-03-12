@@ -3,7 +3,7 @@ Package: BotScanner
 Author: Leon McClatchey
 Company: Linktech Engineering LLC
 Created: 2026-01-01
-Modified: 2026-02-17
+Modified: 2026-03-12
 File: BotScanner/firewall/orchestrator.py
 Description: Describe the purpose of this file
 """
@@ -72,7 +72,7 @@ class FirewallOrchestrator:
 
         for name in active_backend_names:
             try:
-                instance = self.backend_factory.get_backend(name, self.cfg, self.lgr_cfg)
+                instance = self.backend_factory.get_backend(name)
                 backend_instances[name] = instance
             except Exception as e:
                 self.logger.warning(f"[ORCH] failed to initialize backend '{name}': {e}")

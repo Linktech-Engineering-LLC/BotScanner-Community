@@ -152,7 +152,7 @@ vault:
   password_env_variable: "BOTSCANNER_VAULT_PASSWORD_FILE"
   vault_env_variable: "BOTSCANNER_VAULT_PATH"
   mask: 600
-  key: "all"
+  key: "botscanner"
 
 runtime:
   user: "botscanner"

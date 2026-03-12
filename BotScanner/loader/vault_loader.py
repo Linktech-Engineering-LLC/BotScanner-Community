@@ -3,7 +3,7 @@ Package: BotScanner
 Author: Leon McClatchey
 Company: Linktech Engineering LLC
 Created: 2025-12-24
-Modified: 2026-01-05
+Modified: 2026-03-12
 File: BotScanner/loader/vault_loader.py
 Description: VaultLoader loads vault.yml and provides safe access to secrets such as
              sudo_passwords and API tokens, without merging them into host objects.
@@ -26,8 +26,8 @@ class VaultLoader:
     def _resolve_paths(self, cfg_vault: dict):
         """Resolve vault and password file paths based on config and env variables."""
         if cfg_vault.get("use_env_variable", True):
-            vault_path = os.getenv(cfg_vault.get("vault_env_variable", ""), None)
-            pass_path = os.getenv(cfg_vault.get("password_env_variable", ""), None)
+            vault_path = Path(os.getenv(cfg_vault.get("vault_env_variable", ""), None)).expanduser()
+            pass_path = Path(os.getenv(cfg_vault.get("password_env_variable", ""), None)).expanduser()
         else:
             vault_path = None
             pass_path = None
