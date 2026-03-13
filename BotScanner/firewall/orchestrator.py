@@ -3,7 +3,7 @@ Package: BotScanner
 Author: Leon McClatchey
 Company: Linktech Engineering LLC
 Created: 2026-01-01
-Modified: 2026-03-12
+Modified: 2026-03-13
 File: BotScanner/firewall/orchestrator.py
 Description: Describe the purpose of this file
 """
@@ -33,19 +33,21 @@ from .driftchecker import DriftChecker
 from .driftwriter import DriftWriter
 from .crossdrift import CrossDriftChecker, BackendInactiveError
 from .sets.builder import SetElementBuilder
+from ..licensemgr import License
 from .rule import Rule
 from ..utils import Flags
 
 class InvalidOwnerError(Exception):
     pass
 class FirewallOrchestrator:
-    def __init__(self, cfg: dict, lgr_cfg: dict):
+    def __init__(self, cfg: dict, lgr_cfg: dict, license: License):
         self.cfg = cfg
         self.lgr_cfg = lgr_cfg
         self.logger_factory = lgr_cfg.get("factory")
         self.logger = self.logger_factory.get_logger(module="orchestrator")
         self.active_flags = self.lgr_cfg.get("active_flags", [])
         self.sudo_password = self.cfg.get("secrets", {}).get("sudo_pass")
+        self.license = license
         mask_hex = lgr_cfg.get("flags_mask")
         if mask_hex is None:
             mask = 0
@@ -326,7 +328,8 @@ class FirewallOrchestrator:
             backend=backend_enforcer,
             activation_map=self.activation_map,
             element_map=self.element_map,
-            canonical=self.canonical
+            canonical=self.canonical,
+            license = self.license,
         )
 
         # 4. Run full enforcement

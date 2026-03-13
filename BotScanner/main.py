@@ -3,7 +3,7 @@ Package: BotScanner
 Author: Leon McClatchey
 Company: Linktech Engineering LLC
 Created: 2025-12-24
-Modified: 2026-01-21
+Modified: 2026-03-13
 File: BotScanner/main.py
 Description: The BotScanner package is designed to scan and manage bot-related configurations in a network environment.
 """
@@ -12,6 +12,7 @@ import sys
 import logging
 # project imports
 from .firewall.orchestrator import FirewallOrchestrator
+from .licensemgr import License, LicenseManager
 from .loader import ConfigLoader, ConfigResolver, VaultLoader
 from .loggers.log_helpers import (
     init_logger, register_custom_levels
@@ -188,7 +189,7 @@ def run_server_deep(log: dict, cfg: dict):
         server.check_status()
         #server.run_enforcement()  # child classes override this
 # Firewall Orchestrator
-def run_orchestrator(lgr_cfg: dict, cfg: dict):
+def run_orchestrator(lgr_cfg: dict, cfg: dict, license: License):
     triggered = set(Flags.active_in_group("firewall", lgr_cfg["active_flags"]))
     if triggered:
         logger_factory = lgr_cfg.get("factory")
@@ -196,19 +197,26 @@ def run_orchestrator(lgr_cfg: dict, cfg: dict):
         logger.lifecycle(
             f"[FIREWALL] Service instantiation triggered by flags: {', '.join(triggered)}"
         )
-        orch = FirewallOrchestrator(cfg, lgr_cfg)
+        orch = FirewallOrchestrator(cfg, lgr_cfg, license)
         orch.run()
+# Initiate License
+def build_license(cfg: dict, lgr_cfg: dict):
+    logger_factory = lgr_cfg.get("factory")
+    logger = logger_factory.get_logger(module="license")
+    lm = LicenseManager(cfg, logger)
+    return lm.load()
 
 def main(argv=None):
     cfg = load_config()
     cfg = get_arguments(cfg)
     lgr_cfg = initialize_logger(cfg)
+    license_obj = build_license(cfg, lgr_cfg)
     flags = lgr_cfg.get("flags")
     if flags.get("SERVER_DEEP", False):
         run_server_deep(lgr_cfg, cfg)
     elif flags.get("SERVER_STATUS", False):
         run_server_status(lgr_cfg, cfg)
-    run_orchestrator(lgr_cfg, cfg)
+    run_orchestrator(lgr_cfg, cfg, license_obj)
 
  
 if __name__ == "__main__":

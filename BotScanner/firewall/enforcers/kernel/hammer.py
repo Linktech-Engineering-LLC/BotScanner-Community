@@ -4,7 +4,7 @@ Package: BotScanner
 Author: Leon McClatchey
 Company: Linktech Engineering LLC
 Created: 2026-02-14
-Modified: 2026-02-17
+Modified: 2026-03-13
 File: BotScanner/firewall/enforcers/hammer.py
 Description: Describe the purpose of this file
 """
@@ -12,6 +12,7 @@ Description: Describe the purpose of this file
 from typing import Optional
 from pathlib import Path
 # Project Libraries
+from BotScanner.firewall.enums import LifecycleState, ReleaseClass
 from ..result import EnforcementResult
 from ..policy import EnforcementPolicy
 from ...baseline import BaseLine
@@ -36,7 +37,7 @@ class KernelHammer:
     - Perform runtime drift correction
     - Touch activation_map or element_map
     """
-    def __init__(self, cfg, lgr_cfg, backend, activation_map, element_map, canonical):
+    def __init__(self, cfg, lgr_cfg, backend, activation_map, element_map, canonical, license):
         self.cfg = cfg
         self.lgr_cfg = lgr_cfg
 
@@ -52,6 +53,7 @@ class KernelHammer:
         self.activation_map = activation_map
         self.element_map = element_map
         self.canonical = canonical
+        self.license = license
 
     # ------------------------------------------------------------
     # Public entry point

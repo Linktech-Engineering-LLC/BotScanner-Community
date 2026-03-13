@@ -6,6 +6,7 @@ botscanner:
   metadata:
     language: python
     runtime_version: "3.12"
+    license_enabled: false
     license: "DEV-LICENSE-2025" # DEV=Development, COM=Community, PRO=Professinal, ENT=Enterprise
     description: "Network Bot and Threat Scanner with Firewall Enforcement"
 

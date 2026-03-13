@@ -3,7 +3,7 @@ Package: BotScanner
 Author: Leon McClatchey
 Company: Linktech Engineering LLC
 Created: 2026-02-17
-Modified: 2026-02-17
+Modified: 2026-03-13
 File: BotScanner/licensemgr.py
 Description: Describe the purpose of this file
 """
@@ -12,6 +12,15 @@ Description: Describe the purpose of this file
 import os
 # Project Libraries
 from .releaseclass import ReleaseClass
+
+class DummyLicense:
+    """
+    Development-only fallback license.
+    Always returns DEV unless overridden.
+    """
+    def __init__(self, release_class: ReleaseClass = ReleaseClass.DEV):
+        self.release_class = release_class
+        self.raw = None
 
 class License:
     """
@@ -33,6 +42,10 @@ class LicenseManager:
         self.logger = logger
 
     def load(self) -> License:
+        if self.cfg.get("botscanner", {}).get("metadata", {}).get("license_enabled", False) is False:
+            self.logger.lifecycle("[LICENSE] License disabled; using DummyLicense")
+            return DummyLicense()
+
         """
         Load the license file and determine the release class.
         Fallback to COM if missing or invalid.
@@ -48,7 +61,7 @@ class LicenseManager:
                 raw = f.read().strip()
         except Exception as e:
             self.logger.error(f"[LICENSE] Failed to read license file: {e}")
-            return License(ReleaseClass.COM, raw=None)
+            return DummyLicense()
 
         release_class = self._determine_class(raw)
         return License(release_class, raw)

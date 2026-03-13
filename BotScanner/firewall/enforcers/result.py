@@ -3,7 +3,7 @@ Package: BotScanner
 Author: Leon McClatchey
 Company: Linktech Engineering LLC
 Created: 2026-02-17
-Modified: 2026-02-17
+Modified: 2026-03-13
 File: BotScanner/firewall/enforcers/result.py
 Description: Describe the purpose of this file
 """
@@ -16,8 +16,8 @@ from typing import List, Dict, Any
 
 @dataclass
 class EnforcementResult:
-    ok: bool
-    status: str
+    ok: bool = True
+    status: str = "PENDING"
     details: Dict[str, Any] = field(default_factory=dict)
     errors: List[str] = field(default_factory=list)
 
