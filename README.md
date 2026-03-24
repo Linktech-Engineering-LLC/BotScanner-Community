@@ -1,4 +1,10 @@
-# 🛡️ BotScanner‑Community
+# BotScanner — Network Flow & Host Inspection Framework
+![Python Version](https://img.shields.io/badge/python-3.6%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-under--construction-yellow)
+![NMS_Tools](https://img.shields.io/badge/Linktech-BotScanner-blueviolet)
+![Last Commit](https://img.shields.io/github/last-commit/Linktech-Engineering-LLC/BotScanner)
+
 > **Status:** 🚧 Under Construction  
 > This repository contains the public skeleton of BotScanner Community Edition.  
 > Core modules, documentation, and architecture are being published in phases.
