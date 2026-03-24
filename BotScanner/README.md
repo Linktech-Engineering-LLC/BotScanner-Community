@@ -1,7 +1,7 @@
 # BotScanner — Network Flow & Host Inspection Framework
 ![Python Version](https://img.shields.io/badge/python-3.6%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Status](https://img.shields.io/badge/status-stable-brightgreen)
+![Status](https://img.shields.io/badge/status-under--construction-yellow)
 ![NMS_Tools](https://img.shields.io/badge/Linktech-BotScanner-blueviolet)
 
 BotScanner is a policy-driven, backend-agnostic firewall and system configuration manager.  
