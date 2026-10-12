@@ -44,9 +44,7 @@ LIFECYCLE_EVENTS = {
     LifecycleEvents.LOADER_SETUP, 
     LifecycleEvents.START_RUN, 
     LifecycleEvents.DRIFT, 
-    LifecycleEvents.CROSS, 
     LifecycleEvents.SKIP, 
-    LifecycleEvents.RECREATE, 
-    LifecycleEvents.DRIFT
+    LifecycleEvents.RECREATE 
 }
 

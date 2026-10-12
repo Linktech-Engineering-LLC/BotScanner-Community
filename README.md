@@ -41,6 +41,14 @@ These features are designed to help users understand firewall behavior, explore 
 
 ## 🔑 Suggested Keywords
 
+## Related Projects
+
+These tools are part of the broader Linktech Engineering ecosystem:
+
+- **NMS_Tools** — Deterministic monitoring tools (check_cert, check_html, check_interfaces)
+- **licensegen** — Deterministic license generator (Rust)
+- **rust_logger** — Structured logging library for Rust applications
+
 ---
 
 ## 📄 License
